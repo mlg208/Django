@@ -8,12 +8,12 @@ from django.core.serializers.json import DjangoJSONEncoder
 from bboard.models import Bb, Rubric
 
 #
-# def index(request):
-#     resp_content = ('здесь будет', 'главная', 'страница', 'сайта')
-#     resp = StreamingHttpResponse(resp_content, content_type='text/plain; charset=utf-8')
-#     return resp
-#
-# def index(request):
+def index(request):
+    resp_content = ('здесь будет', 'главная', 'страница', 'сайта')
+    resp = StreamingHttpResponse(resp_content, content_type='text/plain; charset=utf-8')
+    return resp
+
+# def index_1(request):
 #     file_name = r'static/bg.jpg'
 #     return FileResponse(open(file_name, 'rb')
 #                         , as_attachment=True,
