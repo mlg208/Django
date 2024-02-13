@@ -18,6 +18,8 @@ class Spare(models.Model):
     def __str__(self):
         return f'{self.name}'
 
+class Engine(models.Model):
+    name = models.CharField(max_length=30)
 
 class Machine(models.Model):
     name = models.CharField(max_length=30)
@@ -45,13 +47,40 @@ class Note(models.Model):
 
 
 
-class Message(models.Model):
+# class Message(models.Model):
+#     content = models.TextField()
+#
+#
+# class PrivateMessage(Message):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     message = models.OneToOneField(Message, on_delete=models.CASCADE, parent_link=True)
+
+
+class BaseMessage(models.Model):
     content = models.TextField()
 
+    class Meta:
+        abstract = True
 
-class PrivateMessage(Message):
+
+class Message(BaseMessage):
+    name = models.CharField(max_length=20)
+    email = models.EmailField()
+
+
+class PrivateMessage(BaseMessage):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    message = models.OneToOneField(Message, on_delete=models.CASCADE, parent_link=True)
+    name = models.CharField(max_length=40)
+
+    class Meta:
+        verbose_name = 'Private Message'
+
+
+class GeneralMessage(PrivateMessage):
+    email = models.EmailField()
+
+    class Meta:
+        verbose_name = 'General Message'
 
 # class Message(models.Model):
 #     content = models.TextField()
