@@ -44,43 +44,68 @@ class Note(models.Model):
     content_object = GenericForeignKey(ct_field='content_type', fk_field='object_id')
 
 
+class Car(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    make = models.CharField(max_length=40)
+    model = models.CharField(max_length=40)
+
+    def __str__(self):
+        return f'{self.make} {self.model} ({self.owner.username})'     #строку украл из гпт
 
 
-
-# class Message(models.Model):
-#     content = models.TextField()
-#
-#
-# class PrivateMessage(Message):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     message = models.OneToOneField(Message, on_delete=models.CASCADE, parent_link=True)
-
-
-class BaseMessage(models.Model):
-    content = models.TextField()
-
-    class Meta:
-        abstract = True
-
-
-class Message(BaseMessage):
-    name = models.CharField(max_length=20)
-    email = models.EmailField()
-
-
-class PrivateMessage(BaseMessage):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+class SparePart(models.Model):
     name = models.CharField(max_length=40)
 
+    def __str__(self):
+        return self.name     #и эту тоже
+
+
+class CarSparePart(models.Model):
+    car = models.ForeignKey(Car, on_delete=models.CASCADE)
+    spare_part = models.ForeignKey(SparePart, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=0)
+
     class Meta:
-        verbose_name = 'Private Message'
+        unique_together = ('car', 'spare_part')
+
+    def __str__(self):
+        return f'{self.car} - {self.spare_part}: {self.quantity}'     #и снова взял из гпт
 
 
-class GeneralMessage(PrivateMessage):
-    email = models.EmailField()
+class Message(models.Model):
+    content = models.TextField()
 
-    class Meta:
-        verbose_name = 'General Message'
+
+class PrivateMessage(Message):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    # message = models.OneToOneField(Message, on_delete=models.CASCADE, parent_link=True)
+
+
+# class BaseMessage(models.Model):
+#     content = models.TextField()
+#
+#     class Meta:
+#         abstract = True
+#
+#
+# class Message(BaseMessage):
+#     name = models.CharField(max_length=20)
+#     email = models.EmailField()
+#
+#
+# class PrivateMessage(BaseMessage):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     name = models.CharField(max_length=40)
+#
+#     class Meta:
+#         verbose_name = 'Private Message'
+#
+#
+# class GeneralMessage(PrivateMessage):
+#     email = models.EmailField()
+#
+#     class Meta:
+#         verbose_name = 'General Message'
 
 # class Message(models.Model):
 #     content = models.TextField()

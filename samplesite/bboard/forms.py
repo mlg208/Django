@@ -48,9 +48,9 @@ from .models import Bb, Rubric
 
 class BbForm(forms.ModelForm):
     title = forms.CharField(
-        label='название товара',
+        label='Название товара',
         validators=[validators.RegexValidator(regex='^.{4,}$')],
-        error_messages={'invalid': 'слишком короткое название товара!'}
+        error_messages={'invalid': 'Слошком короткое название товара!'}
     )
 
     price = forms.DecimalField(label='Цена', decimal_places=2)
@@ -62,7 +62,7 @@ class BbForm(forms.ModelForm):
         # val = self.cleaned_data['title']
         val = self.cleaned_data.get('title')
         if val == 'Прошлогодний снег':
-            raise ValidationError('К продаже не допускается')
+            raise ValidationError('К продаже не допускается!')
         return val
 
     def clean(self):
@@ -95,3 +95,12 @@ class RegisterUserForm(forms.ModelForm):
         fields = ('username', 'email',
                   'password1', 'password2',
                   'first_name', 'last_name')
+
+
+class RubricBaseFormSet(forms.BaseModelFormSet):
+    def clean(self):
+        super().clean()
+        names = [form.cleaned_data['name'] for form in self.forms if 'name' in form.cleaned_data]
+        if ('Недвижимость' not in names) or ('Транспорт' not in names) or ('Мебель' not in names):
+            raise ValidationError(
+                  'Добавьте рубрики недвижимости, транспорта и мебели')
