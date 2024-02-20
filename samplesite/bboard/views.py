@@ -16,7 +16,7 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
-from .forms import BbForm, RubricBaseFormSet
+from .forms import BbForm, RubricBaseFormSet, SearchForm
 from .models import Bb, Rubric
 
 
@@ -181,8 +181,9 @@ def add_save(request):
         context = {'form': bbf}
         return render(request, 'bboard/bb_form.html', context)
 
-def commit_nadler():
-    print("C O M M I T E D")
+
+# def commit_handler():
+#     print("C O M M I T E D")
 
 
 def rubrics(request):
@@ -196,19 +197,20 @@ def rubrics(request):
             instances = formset.save(commit=False)
             for obj in formset:
                 if obj.cleaned_data:
-                    sp = transaction.savepoint()
+                    # sp = transaction.savepoint()
+
                     try:
                         rubric = obj.save(commit=False)
                         rubric.order = obj.cleaned_data[ORDERING_FIELD_NAME]
                         rubric.save()
-                        transaction.savepoint_commit(sp)
-                        print("C O M M I T E D", rubric)
+                        # transaction.savepoint_commit(sp)
+                        print("C O M M I T E D", rubric, type(rubric))
                     except:
-                        transaction.savepoint_rollback(sp)
-                        transaction.commit()
-                        print("N O T   C O M M I T E D", rubric)
+                        # transaction.savepoint_rollback(sp)
+                        # transaction.commit()
+                        print("N O T   C O M M I T E D", obj.cleaned_data['rubric'])
 
-                        # transaction.on_commit(commit_nadler)
+                    # transaction.on_commit(commit_handler)
 
             for obj in formset.deleted_objects:
                 obj.delete()
@@ -223,7 +225,8 @@ def rubrics(request):
     return render(request, 'bboard/rubrics.html', context)
 
 
-
+# @transaction.non_atomic_requests
+# @transaction.atomic
 # @login_required
 # @user_passes_test(lambda user: user.is_staff)
 # @permission_required('bboard.view_rubric')
@@ -246,6 +249,7 @@ def bbs(request, rubric_id):
         formset = BbsFormSet(request.POST, instance=rubric)
 
         if formset.is_valid():
+            # with transaction.atomic():
             formset.save()
             return redirect('bboard:index')
     else:
@@ -253,3 +257,20 @@ def bbs(request, rubric_id):
 
     context = {'formset': formset, 'current_rubric': rubric}
     return render(request, 'bboard/bbs.html', context)
+
+
+def search(request):
+    if request.method == 'POST':
+        sf = SearchForm(request.POST)
+        if sf.is_valid():
+            keyword = sf.cleaned_data['keyword']
+            rubric_id = sf.cleaned_data['rubric'].pk
+            current_rubric = sf.cleaned_data['rubric']
+            # bbs = Bb.objects.filter(title__icontains=keyword, rubric=rubric_id)
+            bbs = Bb.objects.filter(title__iregex=keyword, rubric=rubric_id)
+            context = {'bbs': bbs, 'current_rubric': current_rubric, 'keyword': keyword}
+            return render(request, 'bboard/search_results.html', context)
+    else:
+        sf = SearchForm()
+    context = {'form': sf}
+    return render(request, 'bboard/search.html', context)

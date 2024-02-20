@@ -1,8 +1,16 @@
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.auth.models import Group
+from django.contrib.postgres.fields import DateTimeRangeField, ArrayField, HStoreField, CICharField, JSONField
+from django.contrib.postgres.indexes import GistIndex
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User    # permission и все что с ним связано взял из gpt
 
+
+# class Group(models.Model):
+#     group = Group.objects.create(name='Доступ')
+#     superuser_permission = Permission.objects.get(codename='superuser')
+#     group.permisions.add(superuser_permission)
 
 class AdvUser(models.Model):
     is_activated = models.BooleanField(default=True)
@@ -122,3 +130,36 @@ class PrivateMessage(Message):
 #
 #     class Meta(Message.Meta):
 #         pass
+
+class PGSRoomReserving(models.Model):
+    name = models.CharField(max_length=30, verbose_name='помещение')
+    reserving = DateTimeRangeField(verbose_name='Время резервирования')
+    cancelled = models.BooleanField(default=False, verbose_name='отменить резервирование')
+
+class PGSRubric(models.Model):
+    name = models.CharField(max_length=20, verbose_name='Имя')
+    description = models.TextField(verbose_name='Описание')
+    tags = ArrayField(base_field=models.CharField(max_length=20), verbose_name='Теги')
+
+    class Meta:
+        indexes = [
+            GistIndex(fields=['reserving'],
+                        name='i_pgsrr_reserving',
+                        opclasses=('range_ops',),
+                        fillfactor=50)
+        ]
+class PGSProject(models.Model):
+    name = models.CharField(max_length=40, verbose_name='Название')
+    platform = ArrayField(base_field=ArrayField(
+        base_field=models.CharField(max_length=20)),
+        verbose_name='Используемые платформы'
+    )
+
+class PGSProject2(models.Model):
+    name = models.CharField(max_length=40, verbose_name='Название')
+    platforms = HStoreField(verbose_name='Используемые платформы')
+
+class PGSProject3(models.Model):
+    name = CICharField(max_length=40, verbose_name='Название')
+    data = JSONField()
+

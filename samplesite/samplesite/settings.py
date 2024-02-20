@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'captcha',
+
     'bboard.apps.BboardConfig',  # 'bboard',
     'testapp',
 ]
@@ -70,7 +72,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
 
                 # 'django.template.context_processors.csrf',
-                # 'django.template.context_processors.static',
+                'django.template.context_processors.static',
                 # 'django.template.context_processors.media',
             ],
         },
@@ -82,6 +84,17 @@ WSGI_APPLICATION = 'samplesite.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'postgresql',
+#         'USER': 'postgresql',
+#         'PASSWORD': 'password',
+#         'HOST': '127.0.0.1',
+#         'PORT': '5432',
+#     }
+# }
 
 DATABASES = {
     'default': {
@@ -131,6 +144,11 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
+# STATICFILES_DIRS = [
+#     ('main', BASE_DIR / 'static'),
+# ]
+
+# STATIC_ROOT = BASE_DIR / 'static'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -141,3 +159,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #     # 'bboard.rubric': lambda rec: "/%s/" % rec.pk,
 #     'bboard.rubric': lambda rec: f"/{rec.pk}/",
 # }
+
+LOGIN_URL = "bboard:login"
+LOGIN_REDIRECT_URL = "bboard:index"
+LOGOUT_REDIRECT_URL = "bboard:index"
+
+# Настройки Капчи
+CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.random_char_challenge'
+CAPTCHA_LENGTH = 4  # 6
+CAPTCHA_WORDS_DICTIONARY = '/static/captcha_words.txt'
+CAPTCHA_TIMEOUT = 5  # МИНУТ
+
+
+# DATA_UPLOAD_MAX_MEMORY_SIZE = 2621440  # 2.5 Mbytes
+# DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
