@@ -5,9 +5,32 @@ from django.shortcuts import render, redirect, get_object_or_404, get_list_or_40
 from django.http import StreamingHttpResponse, FileResponse, JsonResponse
 from django.core.serializers.json import DjangoJSONEncoder
 
-from bboard.models import Bb, Rubric
+# from bboard.models import Bb, Rubric
 
-#
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+
+
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            messages.success(request, 'Вы вошли в систему')
+            return redirect('testapp')
+        else:
+            messages.error(request, 'Неверное имя пользователя или пароль.')
+    return render(request, 'login.html')
+
+def logout_view(request):
+    logout(request)
+    messages.info(request, 'Вы успешно вышли из системы.')
+    return redirect('index')  # Замените 'index' на URL вашей главной страницы
+
+
+
 def index(request):
     resp_content = ('здесь будет', 'главная', 'страница', 'сайта')
     resp = StreamingHttpResponse(resp_content, content_type='text/plain; charset=utf-8')

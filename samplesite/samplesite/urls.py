@@ -22,7 +22,10 @@ urlpatterns = [
     path('test/', include('testapp.urls', namespace='test')),
     path('', include('bboard.urls', namespace='bboard')),
 ]
+<<<<<<< HEAD
 
+=======
+>>>>>>> ccb54df53a7f3c2af35465052270e60f578a0aa8
 urlpatterns += [
     path('captcha/', include('captcha.urls')),
 ]

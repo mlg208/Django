@@ -1,7 +1,10 @@
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.db import models
+<<<<<<< HEAD
 from precise_bbcode.fields import BBCodeTextField
+=======
+>>>>>>> ccb54df53a7f3c2af35465052270e60f578a0aa8
 
 is_all_posts_passive = True
 
@@ -30,6 +33,22 @@ class MinMaxValueValidator:
                 params={'min': self.min_value, 'max': self.max_value}
             )
 
+class RubricQuerySet(models.QuerySet):
+    def order_by_bb_count(self):
+        return self.annotate(cnt=models.Count('bb')).order_by('-cnt')
+
+# Диспетчер записей
+class RubricManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().order_by('order', 'name')
+        # return RubricQuerySet(self.model, using=self._db)
+    def order_by_bb_count(self):
+        return super().get_queryset().annotate(
+            cnt=models.Count('bb')).order_by('-cnt')
+        # return self.get_queryset().order_by_bb_count()
+class BbManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().order_by('price')
 
 class RubricQuerySet(models.QuerySet):
     def order_by_bb_count(self):
@@ -54,6 +73,7 @@ class BbManager(models.Manager):
 
 
 class Rubric(models.Model):
+<<<<<<< HEAD
     name = models.CharField(max_length=20, db_index=True,
                             verbose_name='Название', unique=True)
     order = models.SmallIntegerField(default=0, db_index=True)
@@ -63,6 +83,24 @@ class Rubric(models.Model):
 
     # objects = RubricQuerySet.as_manager()
     objects = models.Manager.from_queryset(RubricQuerySet)()
+=======
+    name = models.CharField(max_length=20, db_index=True, verbose_name='Название', unique=True)
+    # slug = models.SlugField(max_length=160, unique=True, verbose_name='Слаг')
+    order = models.SmallIntegerField(default=0, db_index=True)
+    # objects = RubricManager()
+    objects = models.Manager()
+    bbs = RubricManager()
+
+    # objects = RubricQuerySet.as_manager()
+    # objects = models.Manager.from_queryset(RubricQueryset)()
+    def __str__(self):
+        return self.name
+
+class RevRubric(Rubric):
+    class Meta:
+        proxy = True
+        ordering = ['-name']
+>>>>>>> ccb54df53a7f3c2af35465052270e60f578a0aa8
 
     def __str__(self):
         return self.name
@@ -70,6 +108,7 @@ class Rubric(models.Model):
     def get_absolute_url(self):
         return f"/{self.pk}/"
 
+<<<<<<< HEAD
     class Meta:
         verbose_name_plural = 'Рубрики'
         verbose_name = 'Рубрика'
@@ -80,6 +119,12 @@ class RevRubric(Rubric):
     class Meta:
         proxy = True
         ordering = ['-name']
+=======
+class Meta:
+    verbose_name_plural = 'Рубрики'
+    verbose_name = 'Рубрика'
+    ordering = ['name']
+>>>>>>> ccb54df53a7f3c2af35465052270e60f578a0aa8
 
 
 class Bb(models.Model):
@@ -151,4 +196,8 @@ class Bb(models.Model):
         verbose_name_plural = 'Объявления'
         verbose_name = 'Объявление'
         ordering = ['-published', 'title']
+<<<<<<< HEAD
         # order_with_respect_to = 'rubric'
+=======
+        # order_with_respect_to = 'rubric'
+>>>>>>> ccb54df53a7f3c2af35465052270e60f578a0aa8

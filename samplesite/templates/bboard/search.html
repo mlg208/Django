@@ -4,6 +4,7 @@
 
 {% block content %}
 <h2>Поиск объявлений</h2>
+<<<<<<< HEAD
     
 <form method="post" class="col-md-4">
     {% csrf_token %}
@@ -12,3 +13,13 @@
     <p><button type="submit" class="btn btn-primary">Найти</button></p>
 </form>
 {% endblock %}
+=======
+
+<form method="post" class="col-md-4">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <p><button type="submit" class="btn btn-primary">Найти</button></p>
+</form>
+{% endblock %}
+>>>>>>> ccb54df53a7f3c2af35465052270e60f578a0aa8

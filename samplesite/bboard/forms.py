@@ -129,4 +129,8 @@ class SearchForm(forms.Form):
     )
 
     error_css_class = 'form-control is-invalid'
+<<<<<<< HEAD
     required_css_class = 'required'
+=======
+    required_css_class = 'required'
+>>>>>>> ccb54df53a7f3c2af35465052270e60f578a0aa8

@@ -1,2 +1,6 @@
 captcha
+<<<<<<< HEAD
 shmaptcha
+=======
+shmaptcha
+>>>>>>> ccb54df53a7f3c2af35465052270e60f578a0aa8
