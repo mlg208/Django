@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,6 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.postgres',
+
+    'captcha',
+    'precise_bbcode',
 
     'bboard.apps.BboardConfig',  # 'bboard',
     'testapp',
@@ -70,7 +74,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
 
                 # 'django.template.context_processors.csrf',
-                # 'django.template.context_processors.static',
+                'django.template.context_processors.static',
                 # 'django.template.context_processors.media',
             ],
         },
@@ -87,7 +91,18 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        # 'ATOMIC_REQUEST': False,
+        'AUTOCOMMIT': False,
     }
+    # "default": {
+    #     "ENGINE": "django.db.backends.postgresql",
+    #     # "ENGINE": "django.db.backends.postgresql_psycopg2",
+    #     "NAME": "postgres",
+    #     "USER": "postgres",
+    #     "PASSWORD": "12345",
+    #     "HOST": "127.0.0.1",
+    #     "PORT": "5432",
+    # }
 }
 
 
@@ -129,6 +144,11 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
+# STATICFILES_DIRS = [
+#     ('main', BASE_DIR / 'static'),
+# ]
+
+# STATIC_ROOT = BASE_DIR / 'static'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -139,3 +159,26 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #     # 'bboard.rubric': lambda rec: "/%s/" % rec.pk,
 #     'bboard.rubric': lambda rec: f"/{rec.pk}/",
 # }
+
+LOGIN_URL = "bboard:login"
+LOGIN_REDIRECT_URL = "bboard:index"
+LOGOUT_REDIRECT_URL = "bboard:index"
+
+# Настройки Капчи
+CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.random_char_challenge'
+CAPTCHA_LENGTH = 4  # 6
+CAPTCHA_WORDS_DICTIONARY = '/static/captcha_words.txt'
+CAPTCHA_TIMEOUT = 5  # МИНУТ
+
+
+# DATA_UPLOAD_MAX_MEMORY_SIZE = 2621440  # 2.5 Mbytes
+# DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
+
+
+# BBcode
+BBCODE_NEWLINE = '<br>'
+# BBCODE_ESCAPE_HTML = ''
+BBCODE_DISABLE_BUILTIN_TAGS = False
+BBCODE_ALLOW_CUSTOM_TAGS = True
+BBCODE_ALLOW_SMILIES = True
+BBCODE_SMILIES_UPLOAD_TO = os.path.join('static', 'precise_bbcode' 'smilies')

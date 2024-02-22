@@ -1,4 +1,5 @@
 # from django.forms import ModelForm, modelform_factory, DecimalField
+from captcha.fields import CaptchaField
 from django import forms
 from django.core import validators
 from django.contrib.auth.models import User
@@ -48,9 +49,9 @@ from .models import Bb, Rubric
 
 class BbForm(forms.ModelForm):
     title = forms.CharField(
-        label='название товара',
+        label='Название товара',
         validators=[validators.RegexValidator(regex='^.{4,}$')],
-        error_messages={'invalid': 'слишком короткое название товара!'}
+        error_messages={'invalid': 'Слошком короткое название товара!'}
     )
 
     price = forms.DecimalField(label='Цена', decimal_places=2)
@@ -58,11 +59,16 @@ class BbForm(forms.ModelForm):
                                     label='Рубрика', help_text='Не забудь выбрать рубрику!',
                                     widget=forms.widgets.Select(attrs={'size': 8}))
 
+    captcha = CaptchaField(
+        label='Введите текст с картинки',
+        error_messages={'invalid': 'Неправильный текст'},
+    )
+
     def clean_title(self):
         # val = self.cleaned_data['title']
         val = self.cleaned_data.get('title')
         if val == 'Прошлогодний снег':
-            raise ValidationError('К продаже не допускается')
+            raise ValidationError('К продаже не допускается!')
         return val
 
     def clean(self):
@@ -95,3 +101,32 @@ class RegisterUserForm(forms.ModelForm):
         fields = ('username', 'email',
                   'password1', 'password2',
                   'first_name', 'last_name')
+
+
+class RubricBaseFormSet(forms.BaseModelFormSet):
+    def clean(self):
+        super().clean()
+        names = [form.cleaned_data['name'] for form in self.forms if 'name' in form.cleaned_data]
+        if ('Недвижимость' not in names) or ('Транспорт' not in names) or ('Мебель' not in names):
+            raise ValidationError(
+                  'Добавьте рубрики недвижимости, транспорта и мебели')
+
+
+class SearchForm(forms.Form):
+    keyword = forms.CharField(
+        max_length=20,
+        label='Искомое слово',
+        validators=[validators.RegexValidator(regex='^.{4,}$')],
+    )
+    rubric = forms.ModelChoiceField(queryset=Rubric.objects.all(), label='Рубрика')
+
+    captcha = CaptchaField(
+        label='Введите текст с картинки',
+        error_messages={'invalid': 'Неправильный текст'},
+        # generator='captcha.helpers.random_char_challenge',
+        # generator='captcha.helpers.math_challenge',
+        # generator='captcha.helpers.word_challenge',
+    )
+
+    error_css_class = 'form-control is-invalid'
+    required_css_class = 'required'
